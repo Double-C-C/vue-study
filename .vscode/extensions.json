@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    // Vue 3 的语言支持
+    "Vue.volar",
+    // ESLint 插件
+    "dbaeumer.vscode-eslint",
+    // Prettier 插件
+    "esbenp.prettier-vscode",
+    // i18n 插件
+    "Lokalise.i18n-ally"
+  ],
+  "unwantedRecommendations": [
+    // 和 volar 冲突
+    "octref.vetur"
+  ]
+}
