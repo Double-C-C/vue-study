@@ -5,32 +5,21 @@ import {
   Setting,
   User,
   QuestionFilled,
-  Folder,
   Files,
   Document,
 } from "@element-plus/icons-vue";
 import type { Component } from "vue";
 
 export interface NavItem {
-  // 导航项ID
-  id: string;
-  // 显示标签
-  label: string;
-  // 图标组件（可选）
-  icon?: Component;
-  // 路由配置
-  router?: RouteLocationRaw;
-  // 是否禁用
-  disabled?: boolean;
-  // 子菜单（可选）
-  children?: NavItem[];
-  // 是否为分组（分组本身不含路由）
-  isGroup?: boolean;
+  id: string; // id
+  label: string; // 页面标签
+  icon?: Component; // 页面icon
+  router?: RouteLocationRaw; // 页面router
+  disabled?: boolean; // 菜单项是否启用
+  children?: NavItem[]; // router的子router
+  isGroup?: boolean; // 菜单项是否是组属性(可展开)
 }
 
-/**
- * 导航项配置列表
- */
 export const navItems: NavItem[] = [
   {
     id: "home",
@@ -43,18 +32,19 @@ export const navItems: NavItem[] = [
     label: "如何使用",
     icon: QuestionFilled,
     isGroup: true,
+    router: "/guide",
     children: [
       {
-        id: "articles",
-        label: "文章管理",
+        id: "2-1",
+        label: "Markdown测试",
         icon: Document,
-        router: "/content/articles",
+        router: "markdown-test",
       },
       {
         id: "categories",
         label: "分类管理",
         icon: Files,
-        router: "/content/categories",
+        router: "categories",
       },
     ],
   },
@@ -63,12 +53,6 @@ export const navItems: NavItem[] = [
     label: "文档",
     icon: DocumentCopy,
     router: "/document",
-  },
-  {
-    id: "markdownDemo",
-    label: "Markdown 演示",
-    icon: DocumentCopy,
-    router: "/markdown-demo",
   },
   {
     id: "markdownExample",
@@ -88,5 +72,4 @@ export const navItems: NavItem[] = [
     icon: User,
     router: "/profile",
   },
-  // 添加更多导航项...
 ];

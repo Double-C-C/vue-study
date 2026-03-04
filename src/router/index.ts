@@ -1,14 +1,32 @@
 import {
   createRouter,
   createWebHistory,
+  RouterView,
   type RouteRecordRaw,
 } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    name: "home",
-    component: () => import("@/components/sidebar/index.vue"),
+    component: () => import("@/views/layout/index.vue"),
+    children: [
+      {
+        path: "",
+        redirect: "/guide/markdown-test",
+      },
+      {
+        path: "guide",
+        name: "指南",
+        component: RouterView,
+        children: [
+          {
+            path: "markdown-test",
+            name: "MarkDown测试文本",
+            component: () => import("@/views/howToUse/index.vue"),
+          },
+        ],
+      },
+    ],
   },
 ];
 

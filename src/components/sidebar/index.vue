@@ -27,8 +27,14 @@
               href="#"
             >
               <el-icon v-if="item.icon"><component :is="item.icon" /></el-icon>
-              <span class="label">{{ item.label }}</span>
+              <span
+                v-if="!isCollapsed"
+                class="label"
+              >
+                {{ item.label }}
+              </span>
               <el-icon
+                v-if="!isCollapsed"
                 class="expand-icon"
                 :class="{ expanded: expandedGroups[item.id] }"
               >
@@ -37,7 +43,7 @@
             </a>
             <!-- 子菜单 -->
             <ul
-              v-if="expandedGroups[item.id]"
+              v-if="!isCollapsed && expandedGroups[item.id]"
               class="sub-nav"
             >
               <li
@@ -47,8 +53,8 @@
                 :class="{ disabled: child.disabled }"
               >
                 <a
-                  :href="getRouterPath(child.router)"
-                  @click="handleNavClick($event, child)"
+                  :href="getRouterPath(child, item)"
+                  @click="handleNavClick($event, child, item)"
                 >
                   <el-icon><component :is="child.icon" /></el-icon>
                   <span class="label">{{ child.label }}</span>
@@ -63,13 +69,18 @@
             :class="{ disabled: item.disabled }"
           >
             <a
-              :href="getRouterPath(item.router)"
+              :href="getRouterPath(item)"
               @click="handleNavClick($event, item)"
             >
               <el-icon>
                 <component :is="item.icon" />
               </el-icon>
-              <span class="label">{{ item.label }}</span>
+              <span
+                v-if="!isCollapsed"
+                class="label"
+              >
+                {{ item.label }}
+              </span>
             </a>
           </li>
         </template>
@@ -78,7 +89,7 @@
   </aside>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter, type RouteLocationRaw } from "vue-router";
 import { navItems, type NavItem } from "./sidebar";
 import { CaretBottom, Expand, Fold } from "@element-plus/icons-vue";
@@ -94,9 +105,17 @@ navItems.forEach((item) => {
   }
 });
 
+// 初始化 CSS 变量
+onMounted(() => {
+  document.documentElement.style.setProperty("--sidebar-width", "264px");
+});
+
 // 侧边栏是否收缩
 function toggleCollapsed() {
   isCollapsed.value = !isCollapsed.value;
+  // 更新 CSS 变量，使 main 容器的 margin 自动跟随
+  const width = isCollapsed.value ? "64px" : "264px";
+  document.documentElement.style.setProperty("--sidebar-width", width);
 }
 
 // 切换分组展开/折叠
@@ -105,58 +124,98 @@ function toggleGroup(groupId: string) {
 }
 
 // 处理导航点击
-function handleNavClick(event: Event, item: NavItem) {
+function handleNavClick(event: Event, item: NavItem, parent?: NavItem) {
   event.preventDefault();
 
   if (item.disabled || !item.router) {
     return;
   }
 
+  const target = getRouterTarget(item, parent);
+
+  if (!target) {
+    return;
+  }
+
   // 使用 router.push 进行导航
-  router.push(item.router);
+  router.push(target);
+}
+
+// 获取最终路由
+function getRouterTarget(item: NavItem, parent?: NavItem): string | undefined {
+  const childPath = extractPath(item.router);
+  if (!childPath) return undefined;
+
+  return resolvePath(childPath, parent?.router);
 }
 
 // 获取路由路径（用于href属性）
-function getRouterPath(route?: RouteLocationRaw): string {
-  if (!route) return "#";
+function getRouterPath(item: NavItem, parent?: NavItem): string {
+  const target = getRouterTarget(item, parent);
+  if (!target) return "#";
+  return target;
+}
 
-  if (typeof route === "string") {
-    return route;
-  }
+// 提取路径
+function extractPath(route?: RouteLocationRaw): string {
+  if (!route) return "";
+  if (typeof route === "string") return route;
 
   if (typeof route === "object" && "path" in route) {
-    return route.path || "#";
+    return typeof route.path === "string" ? route.path : "";
   }
 
-  return "#";
+  return "";
+}
+
+function resolvePath(
+  childPath: string,
+  parentRoute?: RouteLocationRaw
+): string {
+  if (!childPath) return "#";
+
+  if (childPath.startsWith("/")) return childPath;
+
+  const basePath =
+    typeof parentRoute === "string"
+      ? parentRoute
+      : parentRoute && typeof parentRoute === "object" && "path" in parentRoute
+        ? parentRoute.path || ""
+        : "";
+
+  if (!basePath) return childPath;
+
+  const normalizedBase = basePath.endsWith("/")
+    ? basePath.slice(0, -1)
+    : basePath;
+  const normalizedChild = childPath.startsWith("/")
+    ? childPath.slice(1)
+    : childPath;
+  return `${normalizedBase}/${normalizedChild}`;
 }
 </script>
 <style lang="less" scoped>
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 264px;
-  background: #0d1117;
-  border-right: 1px solid #30363d;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: #ffffff;
   transition: width 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 100;
 
   // 收缩按钮样式
   .sidebar-header {
     padding: 16px;
-    border-bottom: 1px solid #30363d;
+    border-bottom: 1px solid #e1e4e8;
     display: flex;
     justify-content: center;
 
     button {
       background: none;
-      border: 1px solid #30363d;
-      color: #c9d1d9;
+      border: 1px solid #d0d7de;
+      color: #424242;
       padding: 6px;
       border-radius: 6px;
       cursor: pointer;
@@ -166,19 +225,15 @@ function getRouterPath(route?: RouteLocationRaw): string {
       transition: all 0.2s ease;
 
       &:hover {
-        background: #161b22;
-        border-color: #58a6ff;
-        color: #58a6ff;
+        background: #f5f5f5;
+        border-color: #1976d2;
+        color: #1976d2;
       }
     }
   }
 
   &.collapsed {
     width: 64px;
-
-    .label {
-      display: none;
-    }
 
     .sidebar-header {
       button {
@@ -190,7 +245,7 @@ function getRouterPath(route?: RouteLocationRaw): string {
 
   .sidebar-nav {
     flex: 1;
-    padding: 8px 0;
+    padding: 16px 0;
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -201,25 +256,37 @@ function getRouterPath(route?: RouteLocationRaw): string {
     }
 
     .nav-group {
+      margin-bottom: 8px;
+
       .group-title {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 8px 12px;
-        color: #c9d1d9;
+        gap: 10px;
+        padding: 10px 16px;
+        color: #333333;
+        font-weight: 600;
+        font-size: 13px;
         text-decoration: none;
         cursor: pointer;
         transition: all 0.2s ease;
-        margin: 0 4px;
-        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        .el-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+        }
 
         &:hover {
-          background: #161b22;
-          color: #fff;
+          background: #f0f0f0;
+          color: #1976d2;
         }
 
         .expand-icon {
           margin-left: auto;
+          font-size: 14px;
           transition: transform 0.3s ease;
           transform: rotate(-90deg);
 
@@ -233,27 +300,43 @@ function getRouterPath(route?: RouteLocationRaw): string {
         list-style: none;
         margin: 0;
         padding: 0;
-        padding-left: 12px;
+        background-color: #fafafa;
       }
     }
 
     .nav-item {
+      &:not(:last-child) {
+        margin-bottom: 4px;
+      }
+
       a {
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 8px 12px;
-        color: #c9d1d9;
+        padding: 10px 16px;
+        color: #565656;
         text-decoration: none;
         cursor: pointer;
         transition: all 0.2s ease;
+        font-size: 14px;
 
-        margin: 0 4px;
-        border-radius: 4px;
+        .el-icon {
+          font-size: 16px;
+          flex-shrink: 0;
+          color: #999999;
+          transition: color 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
 
         &:hover {
-          background: #161b22;
-          color: #fff;
+          background: #f0f0f0;
+          color: #1976d2;
+
+          .el-icon {
+            color: #1976d2;
+          }
         }
       }
 
@@ -282,11 +365,11 @@ function getRouterPath(route?: RouteLocationRaw): string {
   }
 
   .sidebar-nav::-webkit-scrollbar-thumb {
-    background: #30363d;
+    background: #d9d9d9;
     border-radius: 3px;
 
     &:hover {
-      background: #484f58;
+      background: #bfbfbf;
     }
   }
 }
