@@ -39,9 +39,9 @@ export const navItems: NavItem[] = [
     router: "/",
   },
   {
-    id: "content-group",
-    label: "内容管理",
-    icon: Folder,
+    id: "howToUse",
+    label: "如何使用",
+    icon: QuestionFilled,
     isGroup: true,
     children: [
       {
@@ -63,6 +63,18 @@ export const navItems: NavItem[] = [
     label: "文档",
     icon: DocumentCopy,
     router: "/document",
+  },
+  {
+    id: "markdownDemo",
+    label: "Markdown 演示",
+    icon: DocumentCopy,
+    router: "/markdown-demo",
+  },
+  {
+    id: "markdownExample",
+    label: "Markdown 完整示例",
+    icon: Document,
+    router: "/markdown-example",
   },
   {
     id: "settings",
