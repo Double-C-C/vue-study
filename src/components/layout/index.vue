@@ -4,7 +4,6 @@
       <SideBar />
     </aside>
     <section class="layout-main">
-      <Navbar />
       <main class="layout-content">
         <RouterView />
       </main>
@@ -15,7 +14,6 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
 import SideBar from "@/components/sidebar/index.vue";
-import Navbar from "@/components/layout/navbar.vue";
 </script>
 
 <style lang="less" scoped>

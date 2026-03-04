@@ -4,7 +4,14 @@
     :class="{ collapsed: isCollapsed }"
   >
     <div class="sidebar-header">
+      <div
+        v-if="!isCollapsed"
+        class="sidebar-title"
+      >
+        Markdown Notes
+      </div>
       <button
+        class="toggle-btn"
         @click="toggleCollapsed"
         :title="isCollapsed ? '展开' : '收缩'"
       >
@@ -207,16 +214,29 @@ function resolvePath(
 
   // 收缩按钮样式
   .sidebar-header {
-    padding: 16px;
+    padding: 12px 16px;
     border-bottom: 1px solid #e1e4e8;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
 
-    button {
+    .sidebar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2c3e50;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toggle-btn {
       background: none;
       border: 1px solid #d0d7de;
       color: #424242;
-      padding: 6px;
+      width: 32px;
+      height: 32px;
+      padding: 0;
       border-radius: 6px;
       cursor: pointer;
       display: flex;
@@ -236,10 +256,7 @@ function resolvePath(
     width: 64px;
 
     .sidebar-header {
-      button {
-        width: 32px;
-        height: 32px;
-      }
+      justify-content: center;
     }
   }
 

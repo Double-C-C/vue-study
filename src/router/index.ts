@@ -8,7 +8,7 @@ import {
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    component: () => import("@/views/layout/index.vue"),
+    component: () => import("@/components/layout/index.vue"),
     children: [
       {
         path: "",
@@ -27,6 +27,12 @@ const routes: RouteRecordRaw[] = [
         ],
       },
     ],
+  },
+  // 404Not Found Page
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("@/components/layout/notFoundPage.vue"),
   },
 ];
 
