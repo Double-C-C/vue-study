@@ -39,5 +39,6 @@ import MarkdownTest from "./components/markdownTest.vue";
 .howto-content {
   flex: 1;
   padding: 16px 0 0;
+  margin: 10px;
 }
 </style>

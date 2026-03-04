@@ -25,5 +25,17 @@ const markDownContent = computed(() => {
 <style lang="less" scoped>
 .markdown-content {
   line-height: 1.8;
+
+  // 修复列表样式
+  :deep(ul),
+  :deep(ol) {
+    list-style-position: inside;
+    padding-left: 0;
+    margin: 16px 0;
+  }
+
+  :deep(li) {
+    margin: 8px 0;
+  }
 }
 </style>

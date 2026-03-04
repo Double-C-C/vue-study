@@ -4,7 +4,6 @@ import {
   vueTsConfigs,
 } from "@vue/eslint-config-typescript";
 import pluginVue from "eslint-plugin-vue";
-import { defineOptions } from "vue";
 import eslintConfigPrettier from "eslint-config-prettier";
 
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:

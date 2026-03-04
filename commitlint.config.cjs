@@ -6,6 +6,7 @@ module.exports = {
       "always",
       [
         "feat", // 新功能
+        "ui", // UI变动
         "fix", // 修复bug
         "docs", // 文档变更
         "style", // 代码格式(不影响代码运行)
