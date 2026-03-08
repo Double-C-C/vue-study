@@ -16,6 +16,7 @@ module.exports = {
         "chore", // 构建过程或辅助工具的变动
         "revert", // 回退
         "build", // 打包
+        "ci", // 流水线
       ],
     ],
     "subject-case": [0], // 不限制主题大小写
