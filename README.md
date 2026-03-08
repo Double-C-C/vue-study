@@ -29,7 +29,7 @@ git push origin feature/your-feature-name
 # 3. 提交 MR 到 main , 审查通过后将合并
 ```
 
-没有配置CI/CD流水线 , 提交后会无事发生
+基于githubAction配置CI流水线 , 仅做eslint + prettier代码检查
 
 ## ⚙️ 环境配置
 
